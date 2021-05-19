@@ -128,7 +128,7 @@ class syntax_plugin_dlcounter extends DokuWiki_Syntax_Plugin {
             array_push($result, $file);
         }
 
-        $table = "<table class='shadow-md bg-white' x-data='sortDownloadTable()' class='text-sm' width='100%'>";
+        $table = "<table class='shadow-md text-sm bg-white' x-data='sortDownloadTable()' class='text-sm' width='100%'>";
         
         $table .= "<thead class='bg-gray-200'><tr><th align='left' class='p-2 cursor-pointer' @click='sortByColumn'><i class='material-icons text-sm mr-2'>sort</i>Datei</th><th class='p-2 cursor-pointer' align='left' @click='sortByColumn'>Ort</th><th align='left'  class='p-2 cursor-pointer' @click='sortByColumn'>Erweiterung</th><th align='left' class='p-2 cursor-pointer' @click='sortByColumn'>Letzter Zugriff</th><th class='p-2 cursor-pointer' align='right' @click='sortByColumn'>Downloads</th></tr></thead><tbody x-ref='tbody'>";
         
