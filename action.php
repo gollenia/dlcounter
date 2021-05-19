@@ -64,12 +64,12 @@ class action_plugin_dlcounter extends DokuWiki_Action_Plugin
             
             if(p_get_metadata($data['media'], 'download_stats') == null) {
                 p_set_metadata($data['media'], ['download_stats' => date("Y-m-d")]);
-                error_log("nix da: " . p_get_metadata($data['media'], 'download_stats'));
+                
             } else {
                 var_dump("schon was da");
                 $stats = p_get_metadata($data['media'], 'download_stats') . "," . date("Y-m-d");
                 p_set_metadata($data['media'], ["download_stats" => $stats]);
-                error_log("was da: " . p_get_metadata($data['media'], $stats));
+                
             };
         }
 

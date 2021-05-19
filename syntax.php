@@ -117,7 +117,7 @@ class syntax_plugin_dlcounter extends DokuWiki_Syntax_Plugin {
             $file['extension'] = pathinfo($item['file'], PATHINFO_EXTENSION);
             $ns = explode(":",$item['id']);
             array_pop($ns);
-            var_dump($ns);
+            
             $file['ns'] = implode(":",$ns);
             $file['file'] = $item['file'];
             $file['size'] = $item['size'];
