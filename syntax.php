@@ -122,7 +122,11 @@ class syntax_plugin_dlcounter extends DokuWiki_Syntax_Plugin {
             $file['id'] = $item['id'];
             $file['size'] = $item['size'];
 
-            $file['downloads'] = p_get_metadata($item['id'], 'downloads');
+            $downloads = p_get_metadata($item['id'], 'downloads');
+            if(!$downloads) {
+                $downloads = 0;
+            }
+            $file['downloads'] = $downloads;
             
             $file['last_download'] = p_get_metadata($item['id'], 'last_download');
             array_push($result, $file);
