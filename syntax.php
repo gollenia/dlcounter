@@ -62,7 +62,8 @@ class syntax_plugin_dlcounter extends DokuWiki_Syntax_Plugin {
                     'halign'  => 'center',
                     'bold'    => 'b',
                     'header'  => true,
-                    'htext'   => 'Downloads'
+                    'htext'   => 'Downloads',
+                    'exclude' => ''
                 );
 
         foreach( $params as $item ){
@@ -97,57 +98,58 @@ class syntax_plugin_dlcounter extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($format, Doku_Renderer $renderer, $data) {
-        $fname = DOKU_INC.'data/counts/download_counts.json';
-        $json = json_decode( file_get_contents($fname), TRUE );
+        
+        global $conf;
+        $opt=array('depth'=>0);
+        $res = array(); // search result
+        search($res, $conf['mediadir'], 'search_media', $opt);
+        $extensions = str_replace(' ', '', strtolower($this->getConf('extensions')) );
+        $extensions = explode( ",", $extensions );
+        
+        // prepare return array
+        $result = [];
+        foreach ($res as $item) {
+            $file = [];
+            if(!in_array(pathinfo($item['file'], PATHINFO_EXTENSION), $extensions)) {
+                
+                continue;
+            }
+            $file['extension'] = pathinfo($item['file'], PATHINFO_EXTENSION);
+            $ns = explode(":",$item['id']);
+            array_pop($ns);
+            var_dump($ns);
+            $file['ns'] = implode(":",$ns);
+            $file['file'] = $item['file'];
+            $file['size'] = $item['size'];
+
+            $file['downloads'] = p_get_metadata($item['id'], 'downloads');
+            
+            $file['last_download'] = p_get_metadata($item['id'], 'last_download');
+            array_push($result, $file);
+        }
 
         $command = $data['command'];
-        $file = $data['file'];
 
-        //$renderer->doc .= "<pre>".print_r($data, true)."</pre>"; // for debugging
+        $id  = array_column($result, 'id');
+        $downloads = array_column($data, 'downloads');
 
-        if( $command == 'file' ){
-            // just want a counter
-            $count = 0;
-            if( $file != "" && array_key_exists( $file, $json ) ){
-                $count = $json[$file];
-                $renderer->doc .= $count;
-            }
-        }
-        else {
-            // dump all the data in a table
-            $sort = $data['sort'] == '' ? 'sort' : $data['sort'];
+        array_multisort($downloads, SORT_DESC, $id, SORT_ASC, $result);
 
-            if( $command == 'name' ){
-                $json = $this->dlcounter_switchKeys($json, true);
-
-                if( $sort == 'sort' ) ksort($json);
-                else if( $sort == 'rsort' ) krsort($json);
-                
-                $json = $this->dlcounter_switchKeys($json, false);
-            }
-            else if( $command == 'count' ){
-                if( $sort == 'sort' ) asort( $json );
-                else if( $sort == 'rsort' ) arsort( $json );
-            }
-
-            $table = "<table>";
-            if( $data['header'] ){
-                $table .= "<tr><th colspan=2 style='text-align:".$data['halign'].";'>".$data['htext']."</th></tr>";
-            }
-            foreach( $json as $file => $count ){
-                $fdata = explode(':', $file);
-                $c = count($fdata);
-                $fdata[$c-1] = "<".$data['bold'].">".$fdata[$c-1]."</".$data['bold'].">";
-                if( $data['strip'] ) $file = $fdata[$c-1];
-                else $file = implode(':', $fdata);
-                $table .= "<tr><td style='text-align:".$data['align'].";'>$file</td>".
-                            "<td align=right style='text-align: right;min-width: ".$data['minwidth']."em;padding-left: ".$data['cpad']."em;'>$count</td></tr>";
+            $table = "<table width='100%'>";
+            
+            $table .= "<tr><th>Datei</th><th>Ort</th><th>Erweiterung</th><th>Größe</th><th>Letzter Download</th><th>Downloads Gesamt</th></tr>";
+            
+            foreach( $result as $file ){
+                $table .= "<tr><th align='left'>" . $file['file'] . "</th>".
+                    "<td>" . $file["ns"] . "</td><td>" . $file["extension"] . "</td><td>" . $file["size"] . "</td><td>" . $file["last_download"] . "</td><td>" . $file["downloads"] . "</td></tr>";
             }
             $table .= "</table>";
             $renderer->doc .= $table;
-        }
+            
+        
         return true;
     }
+
 
     
     function dlcounter_switchKeys( $arr, $back2Front ){

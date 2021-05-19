@@ -47,28 +47,35 @@ class action_plugin_dlcounter extends DokuWiki_Action_Plugin
         $extension = explode( ",", $extension );
         $ok = true;
 
+        // Deprecated: Write to file
         if( in_array( strtolower($data['ext']), $extension ) ){
-            $path = DOKU_INC."/data/counts";
-            if( !file_exists($path) ){
-                $ok = mkdir($path,0755);
-            }
-            if( $ok ){
-                $fname = $path.'/download_counts.json';
-                $json = array();
-                if( file_exists( $fname ) ){
-                    $json = json_decode( file_get_contents($fname), TRUE );
-                }
-
-                $count = 0;
-                if( array_key_exists($data['media'], $json) ){
-                    $count = $json[$data['media']];
-                }
+            $count = p_get_metadata($data['media'], 'downloads');
+        
+        
+            if($count) {
                 $count++;
-                $json[$data['media']] = $count;
-
-                file_put_contents( $fname, json_encode($json) );
+            } else {
+                $count = 1;
             }
+            
+            p_set_metadata($data['media'], ['downloads' => $count]);
+            p_set_metadata($data['media'], ['last_download' => date("Y-m-d")]);
+            idx_addPage($data['media'], false, true);
+            
+            if(p_get_metadata($data['media'], 'download_stats') == null) {
+                p_set_metadata($data['media'], ['download_stats' => date("Y-m-d")]);
+                error_log("nix da: " . p_get_metadata($data['media'], 'download_stats'));
+            } else {
+                var_dump("schon was da");
+                $stats = p_get_metadata($data['media'], 'download_stats') . "," . date("Y-m-d");
+                p_set_metadata($data['media'], ["download_stats" => $stats]);
+                error_log("was da: " . p_get_metadata($data['media'], $stats));
+            };
         }
+
+        // Set Metadata
+        
+        
     }
 
 }
