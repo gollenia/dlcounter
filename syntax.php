@@ -119,6 +119,7 @@ class syntax_plugin_dlcounter extends DokuWiki_Syntax_Plugin {
             array_pop($ns);
             $file['ns'] = implode(":",$ns);
             $file['file'] = $item['file'];
+            $file['id'] = $item['id'];
             $file['size'] = $item['size'];
 
             $file['downloads'] = p_get_metadata($item['id'], 'downloads');
@@ -127,23 +128,17 @@ class syntax_plugin_dlcounter extends DokuWiki_Syntax_Plugin {
             array_push($result, $file);
         }
 
-        $command = $data['command'];
+        $table = "<table class='shadow-md bg-white' x-data='sortDownloadTable()' class='text-sm' width='100%'>";
+        
+        $table .= "<thead class='bg-gray-200'><tr><th align='left' class='p-2 cursor-pointer' @click='sortByColumn'><i class='material-icons text-sm mr-2'>sort</i>Datei</th><th class='p-2 cursor-pointer' align='left' @click='sortByColumn'>Ort</th><th align='left'  class='p-2 cursor-pointer' @click='sortByColumn'>Erweiterung</th><th align='left' class='p-2 cursor-pointer' @click='sortByColumn'>Letzter Zugriff</th><th class='p-2 cursor-pointer' align='right' @click='sortByColumn'>Downloads</th></tr></thead><tbody x-ref='tbody'>";
+        
+        foreach( $result as $file ){
+            $table .= "<tr><th class='p-2 whitespace-nowrap' align='left'><a class='wikilink1' href='" . ml($file['id']) . "'><i class='material-icons text-sm mr-2'>file_download</i></a>" . $file['file'] . "</th>".
+                "<td class='p-2'><a class='wikilink1' href='" . wl($file['ns']) . "'>" . $file["ns"] . "</a></td><td class='p-2'>" . $file["extension"] . "</td><td class='p-2'>" . $file["last_download"] . "</td><td  class='p-2' align='right'>" . $file["downloads"] . "</td></tr>";
+        }
+        $table .= "</tbody></table>";
 
-        $id  = array_column($result, 'id');
-        $downloads = array_column($data, 'downloads');
-
-        array_multisort($downloads, SORT_DESC, $id, SORT_ASC, $result);
-
-            $table = "<table width='100%'>";
-            
-            $table .= "<tr><th>Datei</th><th>Ort</th><th>Erweiterung</th><th>Größe</th><th>Letzter Download</th><th>Downloads Gesamt</th></tr>";
-            
-            foreach( $result as $file ){
-                $table .= "<tr><th align='left'>" . $file['file'] . "</th>".
-                    "<td><a class='wikilink1' href='" . wl($file['ns']) . "'>" . $file["ns"] . "</a></td><td>" . $file["extension"] . "</td><td>" . $file["size"] . "</td><td>" . $file["last_download"] . "</td><td>" . $file["downloads"] . "</td></tr>";
-            }
-            $table .= "</table>";
-            $renderer->doc .= $table;
+        $renderer->doc .= $table;
             
         
         return true;

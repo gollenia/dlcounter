@@ -57,7 +57,7 @@ class action_plugin_dlcounter extends DokuWiki_Action_Plugin
             } else {
                 $count = 1;
             }
-            
+            error_log( print_r( $data, true ) );
             p_set_metadata($data['media'], ['downloads' => $count]);
             p_set_metadata($data['media'], ['last_download' => date("Y-m-d")]);
             idx_addPage($data['media'], false, true);
