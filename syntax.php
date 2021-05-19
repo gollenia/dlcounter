@@ -117,7 +117,6 @@ class syntax_plugin_dlcounter extends DokuWiki_Syntax_Plugin {
             $file['extension'] = pathinfo($item['file'], PATHINFO_EXTENSION);
             $ns = explode(":",$item['id']);
             array_pop($ns);
-            
             $file['ns'] = implode(":",$ns);
             $file['file'] = $item['file'];
             $file['size'] = $item['size'];
@@ -141,7 +140,7 @@ class syntax_plugin_dlcounter extends DokuWiki_Syntax_Plugin {
             
             foreach( $result as $file ){
                 $table .= "<tr><th align='left'>" . $file['file'] . "</th>".
-                    "<td>" . $file["ns"] . "</td><td>" . $file["extension"] . "</td><td>" . $file["size"] . "</td><td>" . $file["last_download"] . "</td><td>" . $file["downloads"] . "</td></tr>";
+                    "<td><a class='wikilink1' href='" . wl($file['ns']) . "'>" . $file["ns"] . "</a></td><td>" . $file["extension"] . "</td><td>" . $file["size"] . "</td><td>" . $file["last_download"] . "</td><td>" . $file["downloads"] . "</td></tr>";
             }
             $table .= "</table>";
             $renderer->doc .= $table;
