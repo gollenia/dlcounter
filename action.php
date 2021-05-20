@@ -66,7 +66,6 @@ class action_plugin_dlcounter extends DokuWiki_Action_Plugin
                 p_set_metadata($data['media'], ['download_stats' => date("Y-m-d")]);
                 
             } else {
-                var_dump("schon was da");
                 $stats = p_get_metadata($data['media'], 'download_stats') . "," . date("Y-m-d");
                 p_set_metadata($data['media'], ["download_stats" => $stats]);
                 
